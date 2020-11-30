@@ -2,3 +2,4 @@ twilio==6.48.0
 phonenumbers==8.12.13
 flake8==3.8.4
 pydocstyle==5.1.1
+mypy==0.790

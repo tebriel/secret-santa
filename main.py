@@ -7,8 +7,8 @@ from typing import List, Optional
 from dataclasses import dataclass
 
 import phonenumbers
-from twilio.rest import Client
-client = Client()
+from twilio import rest
+client = rest.Client()
 
 
 @dataclass
@@ -39,7 +39,7 @@ def sms_match(to: Person, match: Person):
     match_first_name = match.name.split()[0]
     client.messages.create(
         to=to.phone_number,
-        from_=os.getenv('TWILIO_FROM'),
+        from_=os.getenv('TWILIO_FROM', ''),
         body=f'''
 Hey {first_name}, it's Secret Santa Time 🤫 🎅 🕑 !
 You've been matched with {match_first_name}!
@@ -51,8 +51,8 @@ def generate_matches() -> List[List[Person]]:
     """Loop until we get a set of valid matches."""
     while True:
         try:
-            matched = []
-            results = []
+            matched: List[Person] = []
+            results: List[List[Person]] = []
             people = load_file()
             for person in people:
                 match = match_person(person, people, matched)
@@ -94,6 +94,7 @@ def load_file() -> List[Person]:
     with open('./user-list.csv') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
+            relation_id: Optional[int]
             if row['Relation ID']:
                 relation_id = int(row['Relation ID'])
             else:
