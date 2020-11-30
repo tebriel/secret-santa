@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+"""Secret Santa SMS Application."""
 import os
 import csv
 import random
@@ -12,6 +13,8 @@ client = Client()
 
 @dataclass
 class Person:
+    """Data object to represent a person from the csv file."""
+
     user_id: int
     name: str
     phone_number: str
@@ -20,6 +23,7 @@ class Person:
 
 
 def main():
+    """Run the program, notify people of their match."""
     matches = generate_matches()
     with open('./matches.txt', 'w') as outfile:
         for match in matches:
@@ -30,6 +34,7 @@ def main():
 
 
 def sms_match(to: Person, match: Person):
+    """Send an SMS to a person letting them know who they have."""
     first_name = to.name.split()[0]
     match_first_name = match.name.split()[0]
     client.messages.create(
@@ -43,6 +48,7 @@ Get them something pretty and be prepared to receive a 🎁 from your Santa!
 
 
 def generate_matches() -> List[List[Person]]:
+    """Loop until we get a set of valid matches."""
     while True:
         try:
             matched = []
@@ -62,6 +68,7 @@ def match_person(
     people: List[Person],
     matched: List[Person],
 ) -> Person:
+    """Match a person, following the rules."""
     def filter_func(x: Person) -> bool:
         if x.user_id == person.user_id:
             return False
@@ -82,6 +89,7 @@ def match_person(
 
 
 def load_file() -> List[Person]:
+    """Load and parse the CSV."""
     results = []
     with open('./user-list.csv') as csvfile:
         reader = csv.DictReader(csvfile)
