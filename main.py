@@ -2,12 +2,13 @@
 import os
 import csv
 import random
-from typing import Dict, List, Optional
+from typing import List, Optional
 from dataclasses import dataclass
 
 import phonenumbers
 from twilio.rest import Client
 client = Client()
+
 
 @dataclass
 class Person:
@@ -17,6 +18,7 @@ class Person:
     relation_id: Optional[int]
     match_id: Optional[int]
 
+
 def main():
     matches = generate_matches()
     with open('./matches.txt', 'w') as outfile:
@@ -25,6 +27,7 @@ def main():
     for match in matches:
         print(f'Sending {match[0].name} their Match!')
         sms_match(*match)
+
 
 def sms_match(to: Person, match: Person):
     first_name = to.name.split()[0]
@@ -37,6 +40,7 @@ Hey {first_name}, it's Secret Santa Time 🤫 🎅 🕑 !
 You've been matched with {match_first_name}!
 Get them something pretty and be prepared to receive a 🎁 from your Santa!
 ''')
+
 
 def generate_matches() -> List[List[Person]]:
     while True:
@@ -52,7 +56,12 @@ def generate_matches() -> List[List[Person]]:
         except IndexError:
             pass
 
-def match_person(person: Person, people: List[Person], matched: List[Person]) -> Person:
+
+def match_person(
+    person: Person,
+    people: List[Person],
+    matched: List[Person],
+) -> Person:
     def filter_func(x: Person) -> bool:
         if x.user_id == person.user_id:
             return False
@@ -71,6 +80,7 @@ def match_person(person: Person, people: List[Person], matched: List[Person]) ->
     person.match_id = match.user_id
     return match
 
+
 def load_file() -> List[Person]:
     results = []
     with open('./user-list.csv') as csvfile:
@@ -81,16 +91,21 @@ def load_file() -> List[Person]:
             else:
                 relation_id = None
             parsed_num = phonenumbers.parse(row['Phone'], 'US')
+            formatted_num = phonenumbers.format_number(
+                parsed_num,
+                phonenumbers.PhoneNumberFormat.E164
+            )
             results.append(
                 Person(
                     user_id=int(row['ID']),
                     name=row['Name'],
-                    phone_number=phonenumbers.format_number(parsed_num, phonenumbers.PhoneNumberFormat.E164),
+                    phone_number=formatted_num,
                     relation_id=relation_id,
                     match_id=None
                 )
             )
     return results
+
 
 if __name__ == '__main__':
     main()
