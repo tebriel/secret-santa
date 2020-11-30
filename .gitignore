@@ -1,0 +1,6 @@
+user-list.csv
+*.pyc
+__pycache__
+.envrc
+matches.txt
+.vscode
