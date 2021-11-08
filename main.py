@@ -25,7 +25,7 @@ class Person:
 def main():
     """Run the program, notify people of their match."""
     matches = generate_matches()
-    with open('./matches.txt', 'w') as outfile:
+    with open('./matches.txt', 'w', encoding='utf-8') as outfile:
         for match in matches:
             outfile.write(f'{match[0].name} gets {match[1].name}\n')
     for match in matches:
@@ -33,12 +33,12 @@ def main():
         sms_match(*match)
 
 
-def sms_match(to: Person, match: Person):
+def sms_match(dest: Person, match: Person):
     """Send an SMS to a person letting them know who they have."""
-    first_name = to.name.split()[0]
+    first_name = dest.name.split()[0]
     match_first_name = match.name.split()[0]
     client.messages.create(
-        to=to.phone_number,
+        to=dest.phone_number,
         from_=os.getenv('TWILIO_FROM', ''),
         body=f'''
 Hey {first_name}, it's Secret Santa Time 🤫 🎅 🕑 !
@@ -91,7 +91,7 @@ def match_person(
 def load_file() -> List[Person]:
     """Load and parse the CSV."""
     results = []
-    with open('./user-list.csv') as csvfile:
+    with open('./user-list.csv', encoding='utf-8') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
             relation_id: Optional[int]
